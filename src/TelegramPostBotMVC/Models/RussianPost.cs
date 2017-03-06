@@ -23,7 +23,7 @@ namespace TelegramPostBotMVC.Models
 			{
 				case "/start":
 					string caption =
-								"Вас приветствует Бот отслеживания почтовых отправлений!\nВведите номер почтового отправления:";
+								"Вас приветствует Бот отслеживания почтовых отправлений!\nВведите номер почтового отправления (v1.0):";
 					await Bot.SendTextMessageAsync(chatId, caption);
 					break;
 				default:
