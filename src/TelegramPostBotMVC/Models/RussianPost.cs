@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using ServiceReference_RussianPost;
 using Telegram.Bot;
@@ -56,8 +57,20 @@ namespace TelegramPostBotMVC.Models
 
 			foreach (var r in operationList)
 			{
-				string dateTime = r.OperationParameters.OperDate.Date + " - " +
-								  r.OperationParameters.OperDate.TimeOfDay;
+
+				StringBuilder sbDateTime = new StringBuilder();
+				sbDateTime
+					.Append(r.OperationParameters.OperDate.Day)
+					.Append(".")
+					.Append(r.OperationParameters.OperDate.Month)
+					.Append(".")
+					.Append(r.OperationParameters.OperDate.Year)
+					.Append(" - ")
+					.Append(r.OperationParameters.OperDate.Hour)
+					.Append(":")
+					.Append(r.OperationParameters.OperDate.Minute);
+						  
+				
 
 				string typeName = r.OperationParameters.OperType.Name;
 				string attrName = r.OperationParameters.OperAttr.Name;
@@ -70,7 +83,7 @@ namespace TelegramPostBotMVC.Models
 				string operLocation = string.IsNullOrEmpty(index) ? discr : index + " " + discr;
 
 				caption =
-					"<b>" + dateTime + "</b>" + "\n" +
+					"<b>" + sbDateTime + "</b>" + "\n" +
 					"<pre>" + operStatus + "</pre>" + "\n" +
 					"<code>" + operLocation + "</code>";
 
