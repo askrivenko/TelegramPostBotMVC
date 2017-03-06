@@ -57,7 +57,6 @@ namespace TelegramPostBotMVC.Models
 
 			foreach (var r in operationList)
 			{
-
 				StringBuilder sbDateTime = new StringBuilder();
 				sbDateTime
 					.Append(r.OperationParameters.OperDate.Day)
@@ -69,8 +68,6 @@ namespace TelegramPostBotMVC.Models
 					.Append(r.OperationParameters.OperDate.Hour)
 					.Append(":")
 					.Append(r.OperationParameters.OperDate.Minute);
-						  
-				
 
 				string typeName = r.OperationParameters.OperType.Name;
 				string attrName = r.OperationParameters.OperAttr.Name;
