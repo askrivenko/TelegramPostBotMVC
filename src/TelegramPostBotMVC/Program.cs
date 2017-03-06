@@ -16,7 +16,8 @@ namespace TelegramPostBotMVC
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()
-                .Build();
+				.UseUrls(args[0])
+				.Build();
 
             host.Run();
         }
