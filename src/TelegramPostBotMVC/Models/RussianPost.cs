@@ -54,20 +54,28 @@ namespace TelegramPostBotMVC.Models
 
 			List<OperationHistoryRecord> operationList = new List<OperationHistoryRecord>(response.OperationHistoryData);
 			//operationList.Reverse();
-
+		    DateTime dateTime;
 			foreach (var r in operationList)
 			{
 				StringBuilder sbDateTime = new StringBuilder();
+
+				dateTime = r.OperationParameters.OperDate;
+
+				string day = dateTime.Day < 10 ? "0" + dateTime.Day.ToString() : dateTime.Day.ToString();
+				string month = dateTime.Month < 10 ? "0" + dateTime.Month.ToString() : dateTime.Month.ToString();
+				string hour = dateTime.Hour < 10 ? "0" + dateTime.Hour.ToString() : dateTime.Hour.ToString();
+				string minute = dateTime.Minute < 10 ? "0" + dateTime.Minute.ToString() : dateTime.Minute.ToString();
+
 				sbDateTime
-					.Append(r.OperationParameters.OperDate.Day)
+					.Append(day)?
 					.Append(".")
-					.Append(r.OperationParameters.OperDate.Month)
+					.Append(month)
 					.Append(".")
 					.Append(r.OperationParameters.OperDate.Year)
 					.Append(" - ")
-					.Append(r.OperationParameters.OperDate.Hour)
+					.Append(hour)
 					.Append(":")
-					.Append(r.OperationParameters.OperDate.Minute);
+					.Append(minute);
 
 				string typeName = r.OperationParameters.OperType.Name;
 				string attrName = r.OperationParameters.OperAttr.Name;
