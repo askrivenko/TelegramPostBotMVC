@@ -11,7 +11,8 @@ using WebTelegram.Models;
 namespace TelegramPostBotMVC.Models
 {
 	public class RussianPost : Post
-    {
+	{
+		private const string Version = "v 1.1";
 		public override async void GetRequestFromTelegramBot(Update request)
 		{
 			if (request.message == null) { return; }
@@ -22,9 +23,14 @@ namespace TelegramPostBotMVC.Models
 			switch (message)
 			{
 				case "/start":
-					string caption =
-								"Вас приветствует Бот отслеживания почтовых отправлений!\nВведите номер почтового отправления (v1.0):";
-					await Bot.SendTextMessageAsync(chatId, caption);
+					StringBuilder caption = new StringBuilder();
+
+					caption
+						.Append("Вас приветствует Бот отслеживания почтовых отправлений! ")
+						.AppendLine(Version)
+						.Append("Введите номер почтового отправления:");
+					
+					await Bot.SendTextMessageAsync(chatId, caption.ToString());
 					break;
 				default:
 					//логика обработки трека
@@ -35,25 +41,31 @@ namespace TelegramPostBotMVC.Models
 					}
 					catch (Exception ex)
 					{
-						caption = ex.Message;
-						await Bot.SendTextMessageAsync(chatId, caption);
+						await Bot.SendTextMessageAsync(chatId, ex.Message);
 					}
 					break;
 			}
 		}
 		public override async void SendPostMessageToTelegramBot(Update request, object responseFromPostService)
 	    {
-		    string caption = "";
+		    
 			getOperationHistoryResponse response = responseFromPostService as getOperationHistoryResponse;
 		    if (response == null)
 		    {
 			    //сообщение об ошибке
 			    return;
 		    }
+
+			string caption = "";
+
+			StringBuilder sbCaption = new StringBuilder();
+
 			long idChat = request.message.chat.id;
 
 			List<OperationHistoryRecord> operationList = new List<OperationHistoryRecord>(response.OperationHistoryData);
+
 			//operationList.Reverse();
+
 		    DateTime dateTime;
 			foreach (var r in operationList)
 			{
@@ -67,7 +79,7 @@ namespace TelegramPostBotMVC.Models
 				string minute = dateTime.Minute < 10 ? "0" + dateTime.Minute.ToString() : dateTime.Minute.ToString();
 
 				sbDateTime
-					.Append(day)?
+					.Append(day)
 					.Append(".")
 					.Append(month)
 					.Append(".")
@@ -78,32 +90,37 @@ namespace TelegramPostBotMVC.Models
 					.Append(minute);
 
 				string typeName = r.OperationParameters.OperType.Name;
+
 				string attrName = r.OperationParameters.OperAttr.Name;
 
 				string operStatus = string.IsNullOrEmpty(attrName) ? typeName : typeName + "-" + attrName;
 				
 				string index = r.AddressParameters.OperationAddress.Index;
+
 				string discr = r.AddressParameters.OperationAddress.Description;
 
 				string operLocation = string.IsNullOrEmpty(index) ? discr : index + " " + discr;
+				
+				
 
-				caption =
-					"<b>" + sbDateTime + "</b>" + "\n" +
-					"<pre>" + operStatus + "</pre>" + "\n" +
-					"<code>" + operLocation + "</code>";
-
+				sbCaption
+					.AppendLine("<b>" + sbDateTime + "</b>")
+					.AppendLine("<pre>" + operStatus + "</pre>")
+					.AppendLine("<code>" + operLocation + "</code>");
+					
 				await Bot.SendTextMessageAsync(idChat, caption, true, false, 0, null, ParseMode.Html);
 			}
 
 			//await bot.SendTextMessageAsync(idChat, seperator);
 			string messageText = request.message.text;
-			caption = 
-				"<b>Дополнительная информация по адресу:\n" +
-				"</b><a href=\"https://www.pochta.ru/tracking#" +
-				messageText + 
-				"\">" + 
-				messageText + 
-				"</a>";
+			
+		    sbCaption.Clear();
+
+		    sbCaption
+			    .AppendLine("<b>Дополнительная информация по адресу:</b>")
+			    .Append("<a href=\"https://www.pochta.ru/tracking#" + messageText + "\">")
+			    .Append(messageText)
+			    .Append("</a>");
 
 			await Bot.SendTextMessageAsync(idChat, caption, true, false, 0, null, ParseMode.Html);
 
