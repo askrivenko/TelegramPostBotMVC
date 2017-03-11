@@ -26,17 +26,21 @@ namespace TelegramPostBotMVC.Models
 					StringBuilder caption = new StringBuilder();
 
 					caption
-						.Append("Вас приветствует Бот отслеживания почтовых отправлений! ")
-						.AppendLine(Version)
+						.AppendLine("Вас приветствует Бот отслеживания почтовых отправлений!")
 						.Append("Введите номер почтового отправления:");
 					
 					await Bot.SendTextMessageAsync(chatId, caption.ToString());
+				
 					break;
+
 				default:
 					//логика обработки трека
 					try
 					{
+						await Bot.SendTextMessageAsync(chatId, "Получение данных почтового отправления...\nПожалуйста подождите.");
+
 						Task<object> response = GetPostData(message);
+
 						SendPostMessageToTelegramBot(request, response.Result);
 					}
 					catch (Exception ex)
@@ -65,11 +69,12 @@ namespace TelegramPostBotMVC.Models
 			List<OperationHistoryRecord> operationList = new List<OperationHistoryRecord>(response.OperationHistoryData);
 
 			//operationList.Reverse();
-
-		    DateTime dateTime;
+			
 			foreach (var r in operationList)
 			{
 				StringBuilder sbDateTime = new StringBuilder();
+
+				DateTime dateTime;
 
 				dateTime = r.OperationParameters.OperDate;
 
@@ -101,17 +106,14 @@ namespace TelegramPostBotMVC.Models
 
 				string operLocation = string.IsNullOrEmpty(index) ? discr : index + " " + discr;
 				
-				
-
 				sbCaption
 					.AppendLine("<b>" + sbDateTime + "</b>")
 					.AppendLine("<pre>" + operStatus + "</pre>")
 					.AppendLine("<code>" + operLocation + "</code>");
-					
-				await Bot.SendTextMessageAsync(idChat, caption, true, false, 0, null, ParseMode.Html);
+				
 			}
-
-			//await bot.SendTextMessageAsync(idChat, seperator);
+			await Bot.SendTextMessageAsync(idChat, sbCaption.ToString(), true, false, 0, null, ParseMode.Html);
+			
 			string messageText = request.message.text;
 			
 		    sbCaption.Clear();
@@ -122,7 +124,7 @@ namespace TelegramPostBotMVC.Models
 			    .Append(messageText)
 			    .Append("</a>");
 
-			await Bot.SendTextMessageAsync(idChat, caption, true, false, 0, null, ParseMode.Html);
+			await Bot.SendTextMessageAsync(idChat, sbCaption.ToString(), true, false, 0, null, ParseMode.Html);
 
 			caption = "Введите номер почтового отправления:";
 			await Bot.SendTextMessageAsync(idChat, caption, true, false, 0, null, ParseMode.Html);
